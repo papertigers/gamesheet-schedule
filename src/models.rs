@@ -32,6 +32,7 @@ pub(crate) struct TeamData {
 #[serde(rename_all = "kebab-case")]
 pub(crate) enum Included {
     ScheduledGames {
+        id: String,
         attributes: GameAttributes,
         relationships: GameRelationships,
     },
