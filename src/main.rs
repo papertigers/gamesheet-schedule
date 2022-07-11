@@ -29,7 +29,8 @@ struct Opt {
 struct Game {
     home: String,
     visitor: String,
-    scheduled_at: String,
+    scheduled_at: DateTime<Utc>,
+    scheduled_at_pretty: String,
     location: String,
 }
 
@@ -62,7 +63,9 @@ fn main() -> Result<()> {
     let since = now.format("%Y-%m-%dT00:00:00Z").to_string();
     let mut url = Url::parse(BASE_URL).unwrap();
     url.set_path(&format!("api/stats/v1/seasons/{id}/schedule"));
-    url.set_query(Some(&format!("offset=0&limit=50&start_time_from={since}")));
+    url.set_query(Some(&format!(
+        "offset=0&limit=50&filter[start_time_from]={since}"
+    )));
 
     let json: GameSheet = http::get(url)?.json()?;
 
@@ -75,7 +78,7 @@ fn main() -> Result<()> {
         })
         .collect();
 
-    let games: Vec<Game> = json
+    let mut games: Vec<Game> = json
         .included
         .iter()
         .filter_map(|i| match i {
@@ -110,12 +113,13 @@ fn main() -> Result<()> {
                     } else {
                         return None;
                     };
-                let scheduled_at = scheduled_at.format("%A %B %d %r").to_string();
+                let scheduled_at_pretty = scheduled_at.format("%A %B %d %I:%M %p").to_string();
 
                 let game = Game {
                     home,
                     visitor,
                     scheduled_at,
+                    scheduled_at_pretty,
                     location,
                 };
 
@@ -124,6 +128,8 @@ fn main() -> Result<()> {
             _ => None,
         })
         .collect();
+
+    games.sort_by_key(|g| g.scheduled_at);
 
     let last_updated = now.format("%A %B %d %r").to_string();
     let schedule = Schedule {
