@@ -13,8 +13,8 @@ pub(crate) struct GameAttributes {
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct GameRelationships {
-    pub home_team: TeamData,
-    pub visitor_team: TeamData,
+    pub home_team: Option<TeamData>,
+    pub visitor_team: Option<TeamData>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -24,7 +24,7 @@ pub(crate) struct Data {
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct TeamData {
-    pub data: Data,
+    pub data: Option<Data>,
 }
 
 #[derive(Deserialize, Debug)]

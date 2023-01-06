@@ -142,16 +142,14 @@ fn main() -> Result<()> {
                 attributes,
                 relationships,
             } => {
-                let home = match teams.get(&relationships.home_team.data.id) {
-                    Some(t) => t,
-                    None => return None,
-                }
-                .to_string();
-                let visitor = match teams.get(&relationships.visitor_team.data.id) {
-                    Some(t) => t,
-                    None => return None,
-                }
-                .to_string();
+                // NB: As of 2023 the schedule seems to allow for null data, so these became
+                // optional.
+                let home = teams
+                    .get(&relationships.home_team.as_ref()?.data.as_ref()?.id)?
+                    .to_string();
+                let visitor = teams
+                    .get(&relationships.visitor_team.as_ref()?.data.as_ref()?.id)?
+                    .to_string();
 
                 if let Some(ref team) = opts.team {
                     if home != *team && visitor != *team {
